@@ -1,0 +1,171 @@
+<!--
+@license
+Copyright (c) 2017 Vaadin Ltd.
+This program is available under Apache License Version 2.0, available at https://vaadin.com/license/
+-->
+
+<!--
+`<vaadin-progress>` is a Polymer element for visualizing progress from 0 to 1.
+
+```html
+<vaadin-progress></vaadin-progress>
+```
+
+@element vaadin-progress
+@demo demo/index.html
+-->
+
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-if.html">
+
+<dom-module id="vaadin-progress">
+  <template>
+    <style>
+      :host {
+        --vaadin-progress-base-color: rgba(0,0,0,0.1);
+        --vaadin-progress-value-color: var(--primary-color, rgba(0,0,0,0.5));
+        --vaadin-progress-line-width: 3px;
+        --vaadin-progress-circle-size: 24px;
+
+        display: block;
+        height: var(--vaadin-progress-line-width);
+        position: relative;
+        margin: 8px 0;
+        overflow: hidden;
+      }
+
+      :host(:not([circle])) .base {
+        width: 100%;
+        height: 100%;
+        background: var(--vaadin-progress-base-color);
+        position: absolute;
+      }
+
+      :host(:not([circle])) .value {
+        width: 100%;
+        height: 100%;
+        background: var(--vaadin-progress-value-color);
+        position: absolute;
+        transform-origin: 0 50%;
+        transition: transform 150ms;
+      }
+
+      /* Indeterminate bar */
+
+      :host(:not([circle]):not([value])) .value {
+        animation: indeterminate-progress-bar 1s infinite;
+      }
+
+      @keyframes indeterminate-progress-bar {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      /* Circle styles */
+
+      :host([circle]) {
+        /* Thinner line by default */
+        --vaadin-progress-line-width: 2px;
+        display: inline-block;
+        width: calc(var(--vaadin-progress-circle-size) + var(--vaadin-progress-line-width));
+        height: calc(var(--vaadin-progress-circle-size) + var(--vaadin-progress-line-width));
+        /* Don’t divide by two to avoid sub-pixels. Accept the increased extra padding */
+        padding: var(--vaadin-progress-line-width);
+        box-sizing: border-box;
+        margin: 8px;
+        overflow: visible;
+      }
+
+      svg {
+        overflow: visible;
+      }
+
+      svg circle {
+        fill: transparent;
+        stroke-width: var(--vaadin-progress-line-width);
+      }
+
+      :host([circle]) .base {
+        stroke: var(--vaadin-progress-base-color);
+      }
+
+      :host([circle]) .value {
+        transition: stroke-dashoffset 150ms;
+        stroke: var(--vaadin-progress-value-color);
+        stroke-linecap: butt;
+        /* 2 * radius(50%) * PI */
+        stroke-dasharray: 314.16%;
+        /* Start the progress from 12 o'clock */
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+      }
+
+      /* Indeterminate circle */
+
+      :host([circle]:not([value])) .value {
+        animation: indeterminate-progress-circle 1.2s infinite linear;
+        transform: none;
+        transition: none;
+      }
+
+      /* TODO WebKit doesn't handle negative dashoffset the same as others, so the animation looks broken */
+      @keyframes indeterminate-progress-circle {
+        0% {
+          stroke-dashoffset: 235%;
+          transform: rotate(-90deg);
+        }
+        100% {
+          stroke-dashoffset: -235%;
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+
+    <template is="dom-if" if="[[circle]]">
+      <svg id="circle" width="100%" height="100%">
+          <circle class="base" r="50%" cx="50%" cy="50%"/>
+          <circle class="value" r="50%" cx="50%" cy="50%" stroke-dashoffset$="[[_computeDashoffset(value)]]"/>
+      </svg>
+    </template>
+
+  <template is="dom-if" if="[[!circle]]">
+      <div class="base"></div>
+      <div class="value" style$="transform: scaleX([[value]])"></div>
+    </template>
+  </template>
+
+  <script>
+    class VaadinProgressElement extends Polymer.Element {
+      static get is() {
+        return 'vaadin-progress';
+      }
+
+      static get properties() {
+        return {
+          value: {
+            type: Number,
+            value: undefined,
+            reflectToAttribute: true
+          },
+          circle: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
+          }
+        };
+      }
+
+      _computeDashoffset(value) {
+        // We could compute this with CSS calc, but Firefox doesn’t like that
+        return 314.16 * (1 - value) + '%';
+      }
+    }
+
+    customElements.define(VaadinProgressElement.is, VaadinProgressElement);
+
+  </script>
+</dom-module>

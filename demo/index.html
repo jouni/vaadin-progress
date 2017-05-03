@@ -1,0 +1,74 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>vaadin-progress Basic Examples</title>
+
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="common.html">
+</head>
+
+<body unresolved>
+  <div class="vertical-section-container centered">
+
+    <demo-navigation></demo-navigation>
+
+    <h3>Progress Bar</h3>
+    <demo-snippet>
+      <template>
+        <vaadin-progress value="0.3"></vaadin-progress>
+
+        <button id="update-bar">Update progress</button>
+
+        <script>
+          document.querySelector("#update-bar").addEventListener("click", function() {
+            var progress = this.previousSibling.previousSibling;
+            progress.value += 0.1;
+            if (progress.value >= 1) {
+              progress.value = 0;
+            }
+          });
+        </script>
+      </template>
+    </demo-snippet>
+
+    <h3>Progress Circle</h3>
+    <demo-snippet>
+      <template>
+        <vaadin-progress circle value="0.3"></vaadin-progress>
+
+        <button id="update-circle">Update progress</button>
+
+        <script>
+          document.querySelector("#update-circle").addEventListener("click", function() {
+            var progress = this.previousSibling.previousSibling;
+            progress.value += 0.1;
+            if (progress.value >= 1) {
+              progress.value = 0;
+            }
+          });
+        </script>
+      </template>
+    </demo-snippet>
+
+    <h3>Indeterminate Progress Bar</h3>
+    <p>When the value is <code>undefined</code> the progress bar will animate indefinitely to show that progress is ongoing.</p>
+    <demo-snippet>
+      <template>
+        <vaadin-progress></vaadin-progress>
+      </template>
+    </demo-snippet>
+
+    <h3>Indeterminate Progress Circle</h3>
+    <p>When the value is <code>undefined</code> the progress circle will animate indefinitely to show that progress is ongoing.</p>
+    <demo-snippet>
+      <template>
+        <vaadin-progress circle></vaadin-progress>
+      </template>
+    </demo-snippet>
+  </div>
+</body>
+</html>
